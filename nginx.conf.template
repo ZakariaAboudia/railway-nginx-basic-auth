@@ -9,10 +9,30 @@ http {
     listen ${PORT};
     server_name _;
 
-    location / {
-        auth_basic	"Restricted";
-        auth_basic_user_file	/etc/nginx/.htpasswd;
-        
+    auth_basic	"Restricted";
+    auth_basic_user_file	/etc/nginx/.htpasswd;  
+    
+    location /api/auth/callback/ {
+        auth_basic off
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+        proxy_http_version 1.1;
+        proxy_pass ${PROXY_PASS};
+    }
+
+    location /api/auth/signin {
+        auth_basic off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+        proxy_http_version 1.1;
+        proxy_pass ${PROXY_PASS};
+    }
+
+    location / {    
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
